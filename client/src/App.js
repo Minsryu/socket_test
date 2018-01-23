@@ -2,8 +2,16 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import io from 'socket.io-client';
-// const socket = window.io();
-let socket = io('http://localhost:3001');
+
+console.log(window.location);
+// 
+// const socket = widow.io();
+
+// const socket = io.connect("http://localhost:3001")
+
+const socket = (window.location.href.indexOf("heroku")!==-1) ? window.io() : io.connect("http://localhost:3001");
+
+// console.log(socket);
 
 class App extends Component {
 
@@ -41,10 +49,21 @@ class App extends Component {
 
       console.log();
 
-      // if(Object.keys(this.state.lobbyList).length>1){
-      //   console.log("there is more than 2 users");
-      // }
+    })
 
+    socket.on('room list',(msg)=>{
+      this.setState(prevState =>({
+        roomList:{
+          ...prevState.roomList,
+          [msg]:msg
+        }
+      }))
+    })
+
+    socket.on('new room', (msg)=>{
+      this.room.roomName = msg;
+      console.log("new room: "+ msg);
+      socket.emit('switch',msg);
     })
 
     socket.on('lobby list', (msg) =>{

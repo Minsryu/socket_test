@@ -28,25 +28,55 @@ var rooms = ['lobby']
 
 io.on('connection', function(socket){
 	
-  console.log(io.engine.clientsCount);
+  var num =io.engine.clientsCount;
 
   socket.on('Login', function(userName){
 
-    var tempName = userName + io.engine.clientsCount;
+    var tempName = userName + num;
+
     socket.username = tempName;
     socket.room = 'lobby';
     socket.join('lobby');
     lobbyList[tempName] = tempName;
     console.log(socket.username)
+
     socket.emit('user name', socket.username);
+
     io.emit('lobby list',lobbyList);
+
+    console.log("lobby list: "+Object.keys(lobbyList).length);
+
+    console.log(lobbyList);
+
+    if(Object.keys(lobbyList).length == 2){
+      console.log("two connection");
+      var roomName = Object.keys(lobbyList)[0] + Object.keys(lobbyList)[1];
+      // io.sockets['in']('lobby')emit('new room',roomName);
+      console.log("if condition: "+roomName);
+      // socket.to('lobby').emit('new room',roomName);
+      io.to('lobby').emit('new room',roomName);
+    }
 
   })
 
   socket.on('chat message', function(msg){
-    // console.log('message: ' + msg);
-    io.emit('chat message', msg)
+    console.log('message: ' + msg.msg);
+    console.log("room: "+socket.room);
+    io.to(socket.room).emit('chat message', msg)
   });
+
+  socket.on('switch',function(newRoom){
+  
+    console.log("switch: "+ newRoom);
+    delete lobbyList[socket.username];
+    console.log(lobbyList);
+    io.emit('lobby list', lobbyList);
+    var oldroom = socket.room;
+    socket.leave(oldroom);
+    socket.join(newRoom);
+    socket.room = newRoom;
+    io.to(socket.room).emit('room list',socket.username);
+  })
 
   console.log('a user connected');
   socket.on('disconnect', function(){
