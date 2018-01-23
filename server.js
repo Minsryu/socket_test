@@ -9,6 +9,9 @@ const io = require('socket.io')(http);
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("client/build"));
 }
+// if (true) {
+//   app.use(express.static("client/build"));
+// }
 
 // Send every request to the React app
 // Define any API routes before this runs
