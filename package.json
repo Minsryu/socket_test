@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Mern Demo",
   "main": "server.js",
+   "homepage": "https://minsryu.github.io/socket_test/",
   "scripts": {
     "server": "node server.js",
     "client": "node scripts/start-client.js",
